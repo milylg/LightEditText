@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp">
+
+        <org.lib.text.effect.InputText
+            android:id="@+id/input_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="start|top"
+            android:padding="5dp"
+            android:background="@drawable/bg_radius_white"
+            android:imeOptions="flagNoExtractUi"
+            android:lineSpacingExtra="6dp"
+            android:minHeight="80dp"
+            android:textColor="#80303030"
+            android:textSize="14sp" />
+    </ScrollView>
+</LinearLayout>

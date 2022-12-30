@@ -1,0 +1,3 @@
+rootProject.name = "LightEditText"
+include ':app'
+include ':text'

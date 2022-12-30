@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/text_tag"
+        android:title="标签"
+        app:showAsAction="always|withText" />
+
+    <item
+        android:id="@+id/text_link"
+        android:icon="@drawable/link"
+        android:title="链接"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/text_bold"
+        android:icon="@drawable/bold"
+        android:title="加粗"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/text_bullet"
+        android:icon="@drawable/bullet"
+        android:title="列表"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/text_strike_line"
+        android:title="删除线"
+        app:showAsAction="always|withText" />
+
+    <item
+        android:id="@+id/text_image"
+        android:title="图片"
+        app:showAsAction="always|withText" />
+
+</menu>

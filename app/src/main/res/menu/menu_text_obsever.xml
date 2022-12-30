@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/html_code"
+        android:title="HTML Code"
+        android:icon="@drawable/ic_html_code"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/html_render"
+        android:title="Render HTML"
+        android:icon="@drawable/ic_render_html"
+        app:showAsAction="always"/>
+</menu>
