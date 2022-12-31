@@ -43,7 +43,7 @@ public class BulletEffect extends Effect<Boolean> {
             str.removeSpan(span);
         }
 
-        if (add.booleanValue()) {
+        if (add) {
             for (Selection chunk : selection.buildSelectionsForLines(str)) {
                 str.setSpan(new NewBulletSpan(10), chunk.getStart(),
                         chunk.getEnd(),

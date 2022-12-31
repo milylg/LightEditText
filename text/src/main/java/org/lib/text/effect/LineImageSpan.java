@@ -3,33 +3,38 @@ package org.lib.text.effect;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.text.style.ImageSpan;
+import android.text.style.ReplacementSpan;
 
 import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 
-public class LineImageSpan extends ImageSpan {
+public class LineImageSpan extends ReplacementSpan {
 
-    private WeakReference<Drawable> drawableRef;
+    private final BitmapDrawable drawable;
 
-    // local image drawable
-    public LineImageSpan(@NonNull Drawable drawable) {
-        super(drawable);
+    public LineImageSpan(@NonNull Context context, @NonNull Bitmap bitmap, float screenWidth) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        Matrix matrix = new Matrix();
+        float scale = screenWidth / width;
+        matrix.postScale(scale, scale);
+
+        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        drawable = new BitmapDrawable(context.getResources(), newBitmap);
+        drawable.setBounds(0, 0, newBitmap.getWidth(), newBitmap.getHeight());
     }
 
-    // image from network
-    public LineImageSpan(Context context, Uri uri) {
-        super(context, uri);
-    }
-
-    @Override public int getSize(Paint paint, CharSequence text, int start, int end,
+    @Override
+    public int getSize(Paint paint, CharSequence text, int start, int end,
                                  Paint.FontMetricsInt fontMetricsInt) {
-        Drawable drawable = getDrawable();
+
         Rect rect = drawable.getBounds();
         if (fontMetricsInt != null) {
             Paint.FontMetricsInt fmPaint = paint.getFontMetricsInt();
@@ -48,7 +53,6 @@ public class LineImageSpan extends ImageSpan {
     @Override
     public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y,
                      int bottom, Paint paint) {
-        Drawable drawable = getCachedDrawable();
         canvas.save();
         Paint.FontMetricsInt fmPaint = paint.getFontMetricsInt();
         int fontHeight = fmPaint.descent - fmPaint.ascent;
@@ -59,18 +63,4 @@ public class LineImageSpan extends ImageSpan {
         canvas.restore();
     }
 
-    private Drawable getCachedDrawable() {
-        WeakReference<Drawable> wr = drawableRef;
-        Drawable d = null;
-        if (wr != null) {
-            d = wr.get();
-        }
-
-        if (d == null) {
-            d = getDrawable();
-            drawableRef = new WeakReference<>(d);
-        }
-
-        return d;
-    }
 }

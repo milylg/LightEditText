@@ -75,7 +75,7 @@ public class ImageEffect extends Effect<ImageSpan> {
             spanBuilder.setSpan(value, 0, spanBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             str.insert(selection.getStart(), spanBuilder);
             editor.setSelection(str.length());
-            str.insert(selection.getStart(), "\n");
+            str.insert(selection.getEnd(), "\n");
         }
     }
 }

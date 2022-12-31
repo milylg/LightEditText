@@ -47,7 +47,7 @@ class ToSpannedConverter implements ContentHandler {
     private final String mSource;
     private final XMLReader mReader;
     private final SpannableStringBuilder mSpannableStringBuilder;
-    private Html.ImageGetter mImageGetter;
+    private final Html.ImageGetter mImageGetter;
     /**
      * FROM_HTML_MODE_COMPACT：html块元素之间使用一个换行符分隔
      * FROM_HTML_MODE_LEGACY：html块元素之间使用两个换行符分隔
@@ -400,6 +400,7 @@ class ToSpannedConverter implements ContentHandler {
         // do nothing.
     }
 
+    @Override
     public void startDocument() {
         // do nothing.
     }
@@ -408,14 +409,17 @@ class ToSpannedConverter implements ContentHandler {
         // do nothing.
     }
 
+    @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         // do nothing.
     }
 
+    @Override
     public void endPrefixMapping(String prefix) throws SAXException {
         // do nothing.
     }
 
+    @Override
     public void startElement(String uri,
                              String localName,
                              String qName,
@@ -423,6 +427,7 @@ class ToSpannedConverter implements ContentHandler {
         handleStartTag(localName, attributes);
     }
 
+    @Override
     public void endElement(String uri,
                            String localName,
                            String qName) throws SAXException {

@@ -94,8 +94,9 @@ public class HtmlHandler {
                     // close the previously opened list
                     isInList = false;
                     out.append("</ul>\n");
+                    out.append("<br>\n");
                 }
-                out.append("<br>\n");
+
             } else {
                 boolean isListItem = false;
                 ParagraphStyle[] paragraphStyles = text.getSpans(i, next, ParagraphStyle.class);
