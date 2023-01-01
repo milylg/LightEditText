@@ -5,7 +5,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.CharacterStyle;
-import android.text.style.ImageSpan;
 import android.text.style.ParagraphStyle;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
@@ -14,6 +13,7 @@ import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
 import org.lib.text.effect.LabelSpan;
+import org.lib.text.effect.LineImageSpan;
 import org.lib.text.effect.NewBulletSpan;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
@@ -67,7 +67,7 @@ public class HtmlHandler {
      * made to add HTML tags corresponding to spans. Also note that HTML metacharacters
      * (such as "&lt;" and "&amp;") within the input text are escaped.
      *
-     * @param text   input text to convert
+     * @param text input text to convert
      * @return string containing input converted to HTML
      */
     public static String toHtml(Spanned text) {
@@ -170,10 +170,12 @@ public class HtmlHandler {
                     out.append("<del>");
                 }
 
-                if (characterStyle instanceof ImageSpan) {
-                    out.append("<img src=\"");
-                    out.append(((ImageSpan) characterStyle).getSource());
-                    out.append("\">");
+                if (characterStyle instanceof LineImageSpan) {
+                    // <img> 是空标签，它只包含属性，并且没有闭合标签。
+                    LineImageSpan imageSpan = ((LineImageSpan) characterStyle);
+                    out.append("<img src=\"").append(imageSpan.source()).append("\" ");
+                    out.append("width=\"").append(imageSpan.width()).append("\" ");
+                    out.append("height=\"").append(imageSpan.height()).append("\">");
 
                     // Don't output the dummy character underlying the image.
                     i = next;

@@ -13,15 +13,14 @@ import android.text.Spanned;
 import android.text.style.AlignmentSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
 import android.text.style.ParagraphStyle;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 
 import org.ccil.cowan.tagsoup.Parser;
-import org.lib.text.R;
 import org.lib.text.effect.LabelSpan;
+import org.lib.text.effect.LineImageSpan;
 import org.lib.text.effect.LinkSpan;
 import org.lib.text.effect.NewBulletSpan;
 import org.lib.text.effect.StrikeLineSpan;
@@ -293,12 +292,16 @@ class ToSpannedConverter implements ContentHandler {
     }
 
     private static void startImg(Editable text, Attributes attributes, Html.ImageGetter img) {
-        // TODO:这里应该增加width和height属性
+
         String src = attributes.getValue("", "src");
+        String width = attributes.getValue("", "width");
+        String height = attributes.getValue("", "height");
+
         Drawable d = null;
 
         if (img != null) {
             d = img.getDrawable(src);
+            d.setBounds(0,0,Integer.parseInt(width), Integer.parseInt(height));
         }
 
         if (d == null) {
@@ -308,8 +311,8 @@ class ToSpannedConverter implements ContentHandler {
 
         int len = text.length();
         text.append("\uFFFC");
-
-        text.setSpan(new ImageSpan(d, src), len, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        LineImageSpan lineImageSpan = new LineImageSpan(d, src);
+        text.setSpan(lineImageSpan, len, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private static void start(Editable text, Object mark) {

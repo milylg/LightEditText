@@ -3,6 +3,7 @@ package org.lib.text;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -36,13 +37,8 @@ public class TextBox extends TextView {
 
     public void input(String html) {
         if (html != null) {
-            setText(HtmlHandler.fromHtml(html, new LocalImageGetter(getContext())));
+            LocalImageGetter imageGetter = new LocalImageGetter(getContext());
+            setText(HtmlHandler.fromHtml(html, imageGetter));
         }
     }
-
-    @Override
-    protected boolean getDefaultEditable() {
-        return false;
-    }
-
 }

@@ -12,23 +12,35 @@ import android.text.style.ReplacementSpan;
 
 import androidx.annotation.NonNull;
 
-import java.lang.ref.WeakReference;
-
 public class LineImageSpan extends ReplacementSpan {
 
-    private final BitmapDrawable drawable;
+    private Drawable drawable;
+    private String source;
+    private int width;
+    private int height;
 
-    public LineImageSpan(@NonNull Context context, @NonNull Bitmap bitmap, float screenWidth) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
+    public LineImageSpan(@NonNull Context context, @NonNull Bitmap bitmap, String path, int screenWidth) {
+        width = bitmap.getWidth();
+        height = bitmap.getHeight();
 
         Matrix matrix = new Matrix();
-        float scale = screenWidth / width;
+        float scale = ((float)screenWidth) / width;
         matrix.postScale(scale, scale);
 
         Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        width = newBitmap.getWidth();
+        height = newBitmap.getHeight();
         drawable = new BitmapDrawable(context.getResources(), newBitmap);
-        drawable.setBounds(0, 0, newBitmap.getWidth(), newBitmap.getHeight());
+        drawable.setBounds(0, 0, width, height);
+        source = path;
+    }
+
+    public LineImageSpan(Drawable drawable, String path) {
+        this.drawable = drawable;
+        this.source = path;
+        Rect bounds = drawable.getBounds();
+        this.width = bounds.width();
+        this.height = bounds.height();
     }
 
     @Override
@@ -63,4 +75,15 @@ public class LineImageSpan extends ReplacementSpan {
         canvas.restore();
     }
 
+    public String source() {
+        return source;
+    }
+
+    public int width() {
+        return width;
+    }
+
+    public int height() {
+        return height;
+    }
 }

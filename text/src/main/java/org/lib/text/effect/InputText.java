@@ -18,22 +18,16 @@ import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Editable;
-import android.text.Html;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.TextWatcher;
 import android.text.style.ClickableSpan;
-import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -44,13 +38,10 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatEditText;
 
-import com.bumptech.glide.Glide;
-
 import org.lib.text.R;
 import org.lib.text.arch.ActionModeListener;
 import org.lib.text.arch.Effect;
 import org.lib.text.arch.ToggleEffect;
-import org.lib.text.html.BitmapTarget;
 import org.lib.text.html.HtmlHandler;
 import org.lib.text.html.LocalImageGetter;
 
@@ -87,7 +78,7 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
     public final Effect<Boolean> STRIKE_LINE = new ToggleEffect<>(StrikeLineSpan.class);
     public final Effect<Boolean> MARK = new ToggleEffect<>(LabelSpan.class);
     public final Effect<String> URL = new URLEffect();
-    public final Effect<ImageSpan> IMAGE = new ImageEffect();
+    public final Effect<LineImageSpan> IMAGE = new ImageEffect();
 
     private float spacingMulti = 1f;
     private float spacingAdd = 0f;
@@ -446,17 +437,9 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
     private void applyImage() {
         if (imageDrawableGetter != null) {
             imageDrawableGetter.getImage((bitmap, path) -> {
-                int width = bitmap.getWidth();
-                int height = bitmap.getHeight();
 
-                Matrix matrix = new Matrix();
-                float scale = ((float)getWidth() / width);
-                matrix.postScale(scale, scale);
-
-                Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-                BitmapDrawable drawable = new BitmapDrawable(getResources(), newBitmap);
-                drawable.setBounds(0, 0, newBitmap.getWidth(), newBitmap.getHeight());
-                applyEffect(IMAGE, new ImageSpan(drawable, path));
+                LineImageSpan imageSpan = new LineImageSpan(getContext(), bitmap, path, getWidth());
+                applyEffect(IMAGE, imageSpan);
             });
         }
     }

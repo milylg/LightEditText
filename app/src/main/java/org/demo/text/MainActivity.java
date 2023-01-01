@@ -21,6 +21,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * ## WARN PROBLEM LOG
+ * W/Glide: Failed to find GeneratedAppGlideModule.
+ * You should include an annotationProcessor compile dependency on
+ * com.github.bumptech.glide:compiler in your application
+ * and a @GlideModule annotated AppGlideModule implementation
+ * or LibraryGlideModules will be silently ignored
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String SHARE_PREFERENCES_NOTE_DIRECTORY = "article";
@@ -86,20 +94,7 @@ public class MainActivity extends AppCompatActivity {
              InputStream inputStream = getContentResolver().openInputStream(image)) {
 
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            // save picture bitmap.
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-
-            // 缩放至InputText编辑区域宽度同比例高度
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-
-            float scale = (float) inputText.getWidth() / width;
-
-            Matrix matrix = new Matrix();
-            matrix.postScale(scale, scale);
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-
-            // 将copy的图像Bitmap写入磁盘
             fos.flush();
             return bitmap;
         } catch (IOException e) {

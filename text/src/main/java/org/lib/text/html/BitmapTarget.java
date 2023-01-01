@@ -3,55 +3,54 @@ package org.lib.text.html;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
 public class BitmapTarget extends CustomTarget<Bitmap> {
 
-    private final BitmapDrawable target;
+    private final LevelListDrawable levelListDrawable;
 
-    public BitmapTarget(BitmapDrawable target) {
-        this.target = target;
+    /**
+     * Creates a new {@link CustomTarget} that will attempt to load the resource in its original size.
+     *
+     * <p>This constructor can cause very memory inefficient loads if the resource is large and can
+     * cause OOMs. It's provided as a convenience for when you'd like to specify dimensions with
+     * {@link RequestOptions#override(int)}.
+     */
+    public BitmapTarget(LevelListDrawable levelListDrawable) {
+        this.levelListDrawable = levelListDrawable;
     }
 
-    public BitmapTarget(int width, int height, BitmapDrawable target) {
-        super(width, height);
-        this.target = target;
-    }
-
+    /**
+     * The method that will be called when the resource load has finished.
+     *
+     * @param resource   the loaded resource.
+     * @param transition
+     */
     @Override
     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
 
-        Drawable drawable = new BitmapDrawable(resource);
-        int width = drawable.getIntrinsicWidth();
-        int height = drawable.getIntrinsicHeight();
-        target.setBounds(0, 0, width, height);
+        BitmapDrawable drawable = new BitmapDrawable(resource);
+        levelListDrawable.addLevel(1,1, drawable);
+        levelListDrawable.setLevel(1);
     }
 
-//        public Bitmap toBitmap(Drawable drawable) {
-//
-//        // 获取 drawable 长宽
-//        int width = drawable.getIntrinsicWidth();
-//        int height = drawable.getIntrinsicHeight();
-//
-//        drawable.setBounds(0, 0, width, height);
-//
-//        // 获取drawable的颜色格式
-//        Bitmap.Config config = drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
-//                : Bitmap.Config.RGB_565;
-//        // 创建bitmap
-//        Bitmap bitmap = Bitmap.createBitmap(width, heigh, config);
-//        // 创建bitmap画布
-//        Canvas canvas = new Canvas(bitmap);
-//        // 将drawable 内容画到画布中
-//        drawable.draw(canvas);
-//        return bitmap;
-//    }
-
+    /**
+     * A <b>mandatory</b> lifecycle callback that is called when a load is cancelled and its resources
+     * are freed.
+     *
+     * <p>You <b>must</b> ensure that any current Drawable received in onResourceReady(Object,
+     * Transition) is no longer used before redrawing the container (usually a View) or changing its
+     * visibility.
+     *
+     * @param placeholder The placeholder drawable to optionally show, or null.
+     */
     @Override
     public void onLoadCleared(@Nullable Drawable placeholder) {
 

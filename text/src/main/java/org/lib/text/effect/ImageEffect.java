@@ -1,9 +1,5 @@
 package org.lib.text.effect;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -13,7 +9,7 @@ import android.text.style.ImageSpan;
 import org.lib.text.arch.Effect;
 import org.lib.text.arch.Selection;
 
-public class ImageEffect extends Effect<ImageSpan> {
+public class ImageEffect extends Effect<LineImageSpan> {
 
     @Override
     public boolean existsInSelection(InputText editor) {
@@ -22,7 +18,7 @@ public class ImageEffect extends Effect<ImageSpan> {
         boolean result = false;
 
         if (selection.getStart() != selection.getEnd()) {
-            ImageSpan[] spans = str.getSpans(selection.getStart(), selection.getEnd(), ImageSpan.class);
+            LineImageSpan[] spans = str.getSpans(selection.getStart(), selection.getEnd(), LineImageSpan.class);
             result = (spans.length > 0);
         } else {
             ImageSpan[] spansBefore =
@@ -37,14 +33,14 @@ public class ImageEffect extends Effect<ImageSpan> {
     }
 
     @Override
-    public ImageSpan valueInSelection(InputText editor) {
+    public LineImageSpan valueInSelection(InputText editor) {
         Selection selection = new Selection(editor);
         Spannable str = editor.getText();
 
-        ImageSpan[] spans = str.getSpans(
+        LineImageSpan[] spans = str.getSpans(
                 selection.getStart(),
                 selection.getEnd(),
-                ImageSpan.class
+                LineImageSpan.class
         );
 
         if (spans.length > 0) {
@@ -55,17 +51,17 @@ public class ImageEffect extends Effect<ImageSpan> {
     }
 
     @Override
-    public void applyToSelection(InputText editor, ImageSpan value) {
+    public void applyToSelection(InputText editor, LineImageSpan value) {
         Selection selection = new Selection(editor);
         Editable str = editor.getText();
 
-        ImageSpan[] spans = str.getSpans(
+        LineImageSpan[] spans = str.getSpans(
                 selection.getStart(),
                 selection.getEnd(),
-                ImageSpan.class
+                LineImageSpan.class
         );
 
-        for (ImageSpan span : spans) {
+        for (LineImageSpan span : spans) {
             str.removeSpan(span);
         }
 
