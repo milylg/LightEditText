@@ -185,3 +185,87 @@ BitmapDrawable drawable = new BitmapDrawable(getResources(), newBitmap);
 drawable.setBounds(0, 0, newBitmap.getWidth(), newBitmap.getHeight());
 ```
 
+
+
+
+
+## InputConnection的作用
+
+InputConnection接口是接收输入的应用程序与InputMethod间的通讯通道。它可以完成以下功能，如读取光标周围的文本，向文本框提交文本，向应用程序提交原始按键事件。InputConnection有几个关键方法，通过重写这几个方法，我们基本可以拦截软键盘的所有输入和点击事件。
+
+- boolean commitText(CharSequence text, int newCursorPosition);
+
+  当输入法输入了字符，包括表情，字母、文字、数字和符号等内容，会回调该方法。
+
+  
+
+- boolean sendKeyEvent(KeyEvent event);
+
+  当有按键输入时，该方法会被回调。比如点击退格键时，搜狗输入法应该就是通过调用该方法，发送keyEvent的，但谷歌输入法却不会调用该方法，而是调用deleteSurroundingText方法。
+  
+- boolean deleteSurroundingText(int beforeLength, int afterLength);
+
+  当有文本删除操作时（剪切，点击退格键），会触发该方法。
+  
+- boolean finishComposingText();
+
+  结束组合文本输入的时候，回调该方法。
+  
+
+## 如何使用InputConnection?
+- 实现了一个 InputConnection子类。
+
+- 与EditText和输入法建立连接。
+  
+
+## 该如何传递给EditText使用呢?
+与EditText和输入法建立连接时，EditText的onCreateInputConnection()方法会被触发。当输入法要和指定View建立连接的时候，系统会通过该方法返回一个InputConnection实例给输入法。所以我们要复写EditText的这个方法，返回我们自己的InputConnection。但实际上EditText的父类TextView已经复写该方法了，并返回了一个 EditableInputConnection 实例，这个类是隐藏的，而且是专门用来连接文本框和输入法的，如果我们要复写一个InputConnection，那么就要完完全全地把EditableInputConnection 功能给照搬下来，否则EditText功能无法正常使用，这成本太高了而且也不好维护。
+
+
+所幸 android 提供了InputConnection 的代理类InputConnectionWrapper类。
+
+
+
+
+
+
+
+## 商业软件中常见的修饰词
+
+| 描述方式     | 说明   | 含义                                                        |
+| ------------ | ------ | ----------------------------------------------------------- |
+| Snapshot     | 快照版 | 尚不稳定、尚处于开发中的版本                                |
+| Alpha        | 内部版 | 严重缺陷基本完成修正并通过复测，但需要完整的功能测试        |
+| Beta         | 测试版 | 相对Alpha版有很大的改进，消除了严重的错误，但还存在一些缺陷 |
+| RC           | 终测版 | Release Candidate（最终测试），即将作为正式版发布           |
+| Demo         | 演示版 | 只集成了正式版部分功能，无法升级                            |
+| SP           | SP1    | 是Service Pack的意思，表示升级包，相信大家在windows中都见过 |
+| Release      | 稳定版 | 功能相对稳定，可以对外发行，但有时间限制                    |
+| Trial        | 试用版 | 试用版，仅对部分用户发行                                    |
+| Full Version | 完整版 | 即正式版，已发布                                            |
+| Unregistered | 未注册 | 有功能或时间限制的版本                                      |
+| Standard     | 标准版 | 能满足正常使用的功能的版本                                  |
+| Lite         | 精简版 | 只含有正式版的核心功能                                      |
+| Enhance      | 增强版 | 正式版，功能优化的版本                                      |
+| Ultimate     | 旗舰版 | 标配版本的升级，体验更好                                    |
+| Professiona  | 专业版 | 针对要求更高、专业性更强的使用群体发行的版本                |
+| Free         | 自由版 | 自由免费使用的版本                                          |
+| Upgrade      | 升级版 | 有功能增强或修复了已知缺陷                                  |
+| Retail       | 零售版 | 单独发售                                                    |
+| Cardware     | 共享版 | 公用许可证（iOS签证）                                       |
+| LTS          | 维护版 | 该版本需要长期维护                                          |
+
+
+
+### Spring版本命名规则
+
+| 描述方式 | 说明     | 含义                                                         |
+| -------- | -------- | ------------------------------------------------------------ |
+| Snapshot | 快照版   | 尚不稳定、尚处于开发中的版本                                 |
+| Release  | 稳定版   | 功能相对稳定，可以对外发行，但有时间限制                     |
+| GA       | 正式版   | 代表广泛可用的稳定版（General Availability）                 |
+| M        | 里程碑版 | 具有一些全新的功能或具有里程碑意义的版本（M是Milestone的意思） |
+| RC       | 终测版   | Release Candidate（最终测试），即将作为正式版发布            |
+
+
+

@@ -4,26 +4,29 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+
 
 public class BitmapTarget extends CustomTarget<Bitmap> {
 
     private final LevelListDrawable levelListDrawable;
+    private final TextView view;
 
     /**
      * Creates a new {@link CustomTarget} that will attempt to load the resource in its original size.
      *
      * <p>This constructor can cause very memory inefficient loads if the resource is large and can
      * cause OOMs. It's provided as a convenience for when you'd like to specify dimensions with
-     * {@link RequestOptions#override(int)}.
+     * {RequestOptions#override(int)}.
      */
-    public BitmapTarget(LevelListDrawable levelListDrawable) {
+    public BitmapTarget(TextView textView, LevelListDrawable levelListDrawable) {
+        this.view = textView;
         this.levelListDrawable = levelListDrawable;
     }
 
@@ -36,9 +39,10 @@ public class BitmapTarget extends CustomTarget<Bitmap> {
     @Override
     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
 
-        BitmapDrawable drawable = new BitmapDrawable(resource);
+        BitmapDrawable drawable = new BitmapDrawable(view.getResources(), resource);
         levelListDrawable.addLevel(1,1, drawable);
         levelListDrawable.setLevel(1);
+        view.setText(view.getText());
     }
 
     /**

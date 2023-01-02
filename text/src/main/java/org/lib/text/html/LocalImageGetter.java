@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
 import android.text.Html;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -28,10 +29,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
  */
 public class LocalImageGetter implements Html.ImageGetter {
 
-    private final Context context;
+    private final TextView view;
 
-    public LocalImageGetter(Context context) {
-        this.context = context;
+    public LocalImageGetter(TextView view) {
+        this.view = view;
     }
 
     /**
@@ -41,11 +42,11 @@ public class LocalImageGetter implements Html.ImageGetter {
     @Override
     public Drawable getDrawable(String source) {
         final LevelListDrawable levelListDrawable = new LevelListDrawable();
-        Glide.with(context)
+        Glide.with(view)
                 .asBitmap()
                 .load(source)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(new BitmapTarget(levelListDrawable));
+                .into(new BitmapTarget(view, levelListDrawable));
         return levelListDrawable;
     }
 }

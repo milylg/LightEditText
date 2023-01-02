@@ -37,7 +37,7 @@ public class TextBox extends TextView {
 
     public void input(String html) {
         if (html != null) {
-            LocalImageGetter imageGetter = new LocalImageGetter(getContext());
+            LocalImageGetter imageGetter = new LocalImageGetter(this);
             setText(HtmlHandler.fromHtml(html, imageGetter));
         }
     }
