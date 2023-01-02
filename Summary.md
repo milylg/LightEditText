@@ -185,3 +185,43 @@ BitmapDrawable drawable = new BitmapDrawable(getResources(), newBitmap);
 drawable.setBounds(0, 0, newBitmap.getWidth(), newBitmap.getHeight());
 ```
 
+
+
+
+
+## InputConnection的作用
+
+InputConnection接口是接收输入的应用程序与InputMethod间的通讯通道。它可以完成以下功能，如读取光标周围的文本，向文本框提交文本，向应用程序提交原始按键事件。InputConnection有几个关键方法，通过重写这几个方法，我们基本可以拦截软键盘的所有输入和点击事件。
+
+- boolean commitText(CharSequence text, int newCursorPosition);
+
+  当输入法输入了字符，包括表情，字母、文字、数字和符号等内容，会回调该方法。
+
+  
+
+- boolean sendKeyEvent(KeyEvent event);
+
+  当有按键输入时，该方法会被回调。比如点击退格键时，搜狗输入法应该就是通过调用该方法，发送keyEvent的，但谷歌输入法却不会调用该方法，而是调用deleteSurroundingText方法。
+   
+
+- boolean deleteSurroundingText(int beforeLength, int afterLength);
+
+  当有文本删除操作时（剪切，点击退格键），会触发该方法。
+   
+
+- boolean finishComposingText();
+
+  结束组合文本输入的时候，回调该方法。
+   
+
+## 如何使用InputConnection?
+- 实现了一个 InputConnection子类。
+
+- 与EditText和输入法建立连接。
+  
+
+## 该如何传递给EditText使用呢?
+与EditText和输入法建立连接时，EditText的onCreateInputConnection()方法会被触发。当输入法要和指定View建立连接的时候，系统会通过该方法返回一个InputConnection实例给输入法。所以我们要复写EditText的这个方法，返回我们自己的InputConnection。但实际上EditText的父类TextView已经复写该方法了，并返回了一个 EditableInputConnection 实例，这个类是隐藏的，而且是专门用来连接文本框和输入法的，如果我们要复写一个InputConnection，那么就要完完全全地把EditableInputConnection 功能给照搬下来，否则EditText功能无法正常使用，这成本太高了而且也不好维护。
+
+
+所幸 android 提供了InputConnection 的代理类InputConnectionWrapper类。
