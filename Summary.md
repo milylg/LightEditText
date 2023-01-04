@@ -224,4 +224,4 @@ InputConnection接口是接收输入的应用程序与InputMethod间的通讯通
 与EditText和输入法建立连接时，EditText的onCreateInputConnection()方法会被触发。当输入法要和指定View建立连接的时候，系统会通过该方法返回一个InputConnection实例给输入法。所以我们要复写EditText的这个方法，返回我们自己的InputConnection。但实际上EditText的父类TextView已经复写该方法了，并返回了一个 EditableInputConnection 实例，这个类是隐藏的，而且是专门用来连接文本框和输入法的，如果我们要复写一个InputConnection，那么就要完完全全地把EditableInputConnection 功能给照搬下来，否则EditText功能无法正常使用，这成本太高了而且也不好维护。
 
 
-所幸 android 提供了InputConnection 的代理类InputConnectionWrapper类。
+所幸 android 提供了InputConnection 的代理类**`InputConnectionWrapper`**类。

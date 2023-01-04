@@ -3,12 +3,10 @@ package org.lib.text;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import org.lib.text.html.HtmlHandler;
-import org.lib.text.html.LocalImageGetter;
 
 @SuppressLint("AppCompatCustomView")
 public class TextBox extends TextView {
@@ -37,8 +35,7 @@ public class TextBox extends TextView {
 
     public void input(String html) {
         if (html != null) {
-            LocalImageGetter imageGetter = new LocalImageGetter(getContext());
-            setText(HtmlHandler.fromHtml(html, imageGetter));
+            setText(HtmlHandler.fromHtml(html));
         }
     }
 }

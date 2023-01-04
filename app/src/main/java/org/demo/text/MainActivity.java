@@ -51,56 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupInputText() {
         inputText = findViewById(R.id.input_area);
-        inputText.setImageDrawableGetter(postProcessor -> {
-            this.imagePostProcessor = postProcessor;
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(intent, IMAGE_REQUEST_CODE);
-        });
-
         SharedPreferences preferences = getSharedPreferences(SHARE_PREFERENCES_NOTE_DIRECTORY, MODE_PRIVATE);
         String htmlCode = preferences.getString(NOTE_KEY, DEFAULT_NOTE_VALUE);
         inputText.input(htmlCode);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_REQUEST_CODE) {
-            Uri uri;
-            if (data != null && (uri = data.getData()) != null) {
-                String filePath = buildNewFileForImage();
-                Bitmap bitmap = copyImage(uri, filePath);
-                if (bitmap != null) {
-                    imagePostProcessor.handleImage(bitmap, filePath);
-                }
-            }
-        }
-    }
-
-    private String buildNewFileForImage() {
-        File directory = getExternalFilesDir("images");
-
-        // NOTE: folder name must be not include '/' symbol.
-        // Cause: open failed: ENOENT (No such file or directory)
-        return directory.getAbsolutePath() + File.separator + "example.jpg";
-    }
-
-    private Bitmap copyImage(Uri image, String copyTo) {
-
-        File copiedImageFile = new File(copyTo);
-
-        try (FileOutputStream fos = new FileOutputStream(copiedImageFile);
-             InputStream inputStream = getContentResolver().openInputStream(image)) {
-
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-            fos.flush();
-            return bitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override

@@ -33,8 +33,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
@@ -42,14 +40,10 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 import org.lib.text.R;
 import org.lib.text.arch.ActionModeListener;
-import org.lib.text.arch.BackspaceKeyListener;
 import org.lib.text.arch.Effect;
-import org.lib.text.arch.KeyInputConnectionWrapper;
 import org.lib.text.arch.ToggleEffect;
 import org.lib.text.html.HtmlHandler;
-import org.lib.text.html.LocalImageGetter;
 
-import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -62,47 +56,6 @@ import java.lang.reflect.Method;
  * (http://github.com/commonsguy/cwac-richedit). Concepts in
  * this editor were inspired by:
  * http://code.google.com/p/droid-writer
- * <p>
- * ## How to use it?
- * <p>
- * 1. Initialized 'InputText' Component.
- * 2. Set 'ImageDrawableGetter' interface for 'InputText' object.
- * 3. Handle 'Pick picture' or 'Take photo' to get bitmap of image.
- * - Create file for copy image.
- * - Copy image by uri, and scale image bitmap.
- * - Handle image bitmap by 'ImagePostProcessor' object.
- * <p>
- * InputConnection接口是接收输入的应用程序与InputMethod间的通讯通道。
- * 它可以完成以下功能，如读取光标周围的文本，向文本框提交文本，向应用程序提交原始按键事件。
- * <p>
- * EditText Default Input Connect Flow
- * <p>
- * +++++++++++++++++++++                           +++++++++++++++++++++++                        +++++++++++++++++++++++++
- * +                   +       Key Event           +                     +       Key Event
- * +   Input Method    +  ++++++++++++++++++++++>  +   Input Connection  +  +++++++++++++++++++>  +       Edit Text       +
- * +                   +     [Input,Delete]        +                     +     [Input,Delete]
- * +++++++++++++++++++++                           +++++++++++++++++++++++                        +++++++++++++++++++++++++
- * <p>
- * <p>
- * EditText Provide A InputConnectWrapper For Programmer (user)
- * <p>
- *                                         +++++++++++++++++++++++                        +++++++++++++++++++++++++
- *                                         +                     +       Key Event
- *                                         +   Input Connection  +  +++++++++++++++++++>  +       Edit Text       +
- *                                         +                     +     [Input,Delete]
- *                                         +++++++++++++++++++++++                        +++++++++++++++++++++++++
- *                                                   +
- * +++++++++++++++++++++                             +
- * +                   +                             +
- * +    Input Method   +                        No Interrupt
- * +                   +                         Key Event
- * +++++++++++++++++++++                             +
- *          +                                        +
- *          +                             +++++++++++++++++++++++++                      ++++++++++++++++++++++++++
- *          +            Key Event        +                       +      Interrupt       +                        +
- *          +++++++++++++++++++++++++++++++InputConnectionWrapper ++++++++++++++++++++++++       Do Something     +
- *                    [Input,Delete]      +                       +      Key Event       +                        +
- *                                        +++++++++++++++++++++++++                      ++++++++++++++++++++++++++
  */
 public class InputText extends AppCompatEditText implements ActionModeListener {
 
@@ -115,7 +68,6 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
     public final Effect<Boolean> STRIKE_LINE = new ToggleEffect<>(StrikeLineSpan.class);
     public final Effect<Boolean> MARK = new ToggleEffect<>(LabelSpan.class);
     public final Effect<String> URL = new URLEffect();
-    public final Effect<LineImageSpan> IMAGE = new ImageEffect();
 
     private float spacingMulti = 1f;
     private float spacingAdd = 0f;
@@ -124,8 +76,6 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
     private int cursorHeight = 25;
 
     private ClipboardManager clipboardManager;
-    private ImageDrawableGetter imageDrawableGetter;
-    private KeyInputConnectionWrapper keyInputConnectionWrapper;
 
     @FunctionalInterface
     public interface ImageDrawableGetter {
@@ -168,7 +118,6 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
         initLineSpacingAddAndLineSpacingMulti();
         initCursorParameter();
         initTextCursorDrawable();
-        initInputConnection();
         listenTextChange();
     }
 
@@ -234,9 +183,6 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
         }
     }
 
-    private void initInputConnection() {
-        keyInputConnectionWrapper = new KeyInputConnectionWrapper(null, true);
-    }
 
     private void listenTextChange() {
         addTextChangedListener(new TextWatcher() {
@@ -259,56 +205,6 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
 
             }
         });
-    }
-
-    /**
-     * File delete and deleteOnExit Difference.
-     * - File.delete为直接删除
-     * - deleteOnExit文档解释为：在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
-     * 程序运行deleteOnExit成功后，File并没有直接删除，而是在虚拟机正常运行结束后才会删除。
-     * <p>
-     * File创建文件的另一个方法：createTempFile（在默认临时文件目录中创建一个空文件，使用给定前缀和后缀生成其名称）。
-     * <p>
-     * 这两个方法(delete and deleteOnExit)其实是对应的，使用场景：
-     * 程序有个需求需要创建临时文件，这个临时文件可能作为存储使用，但是程序运行结束后，这个文件应该就被删除了。
-     * 在哪里做删除操作呢，需要监控程序关闭吗，如果有很多地方可以中止程序，这个删除操作需要都放置一份吗？
-     * 其实只要这么写,程序结束后文件就会被自动删除了：
-     * <p>
-     * File file=File.createTempFile("tmp",null);
-     * <p>
-     * file.deleteOnExit(); // 这里对文件进行删除操作
-     *
-     * @param outAttrs
-     * @return
-     */
-    @Override
-    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-
-        BackspaceKeyListener listener = () -> {
-
-            Editable editable = getText();
-            int start = getSelectionStart();
-            int end = getSelectionEnd();
-            assert editable != null;
-            LineImageSpan[] imageSpans = editable.getSpans(start, end, LineImageSpan.class);
-
-            if (imageSpans.length <= 0) {
-                return ;
-            }
-
-            LineImageSpan imageSpan = imageSpans[0];
-            String path = imageSpan.source();
-            File image = new File(path);
-            if (image.exists() && image.isFile()) {
-                if (!image.delete()) {
-                    System.out.println("delete failed!");
-                }
-            }
-        };
-
-        keyInputConnectionWrapper.setTarget(super.onCreateInputConnection(outAttrs));
-        keyInputConnectionWrapper.setBackspaceKeyAction(listener);
-        return keyInputConnectionWrapper;
     }
 
     /**
@@ -483,8 +379,6 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
             toggleEffect(MARK);
         } else if (itemId == R.id.text_strike_line) {
             toggleEffect(STRIKE_LINE);
-        } else if (itemId == R.id.text_image) {
-            applyImage();
         } else {
             return false;
         }
@@ -526,20 +420,9 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
         return url.matches(LINK_PATTERN);
     }
 
-    private void applyImage() {
-        if (imageDrawableGetter == null) {
-            return;
-        }
-
-        imageDrawableGetter.getImage((bitmap, path) -> {
-            LineImageSpan imageSpan = new LineImageSpan(getContext(), bitmap, path, getWidth());
-            applyEffect(IMAGE, imageSpan);
-        });
-    }
-
     public void input(String html) {
         if (html != null) {
-            setText(HtmlHandler.fromHtml(html, new LocalImageGetter(getContext())));
+            setText(HtmlHandler.fromHtml(html));
         }
     }
 
@@ -549,9 +432,5 @@ public class InputText extends AppCompatEditText implements ActionModeListener {
 
     private void updateLineGroups() {
         ((BulletEffect) BULLET).updateBullets(this);
-    }
-
-    public void setImageDrawableGetter(ImageDrawableGetter imageGetter) {
-        this.imageDrawableGetter = imageGetter;
     }
 }

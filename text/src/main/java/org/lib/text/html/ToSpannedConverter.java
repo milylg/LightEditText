@@ -1,11 +1,8 @@
 package org.lib.text.html;
 
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.text.Editable;
-import android.text.Html;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -20,7 +17,6 @@ import android.text.style.UnderlineSpan;
 
 import org.ccil.cowan.tagsoup.Parser;
 import org.lib.text.effect.LabelSpan;
-import org.lib.text.effect.LineImageSpan;
 import org.lib.text.effect.LinkSpan;
 import org.lib.text.effect.NewBulletSpan;
 import org.lib.text.effect.StrikeLineSpan;
@@ -46,7 +42,6 @@ class ToSpannedConverter implements ContentHandler {
     private final String mSource;
     private final XMLReader mReader;
     private final SpannableStringBuilder mSpannableStringBuilder;
-    private final Html.ImageGetter mImageGetter;
     /**
      * FROM_HTML_MODE_COMPACT：html块元素之间使用一个换行符分隔
      * FROM_HTML_MODE_LEGACY：html块元素之间使用两个换行符分隔
@@ -97,11 +92,10 @@ class ToSpannedConverter implements ContentHandler {
         return sTextDecorationPattern;
     }
 
-    public ToSpannedConverter(String source, Parser parser, Html.ImageGetter imageGetter) {
+    public ToSpannedConverter(String source, Parser parser) {
         mSource = source;
         mSpannableStringBuilder = new SpannableStringBuilder();
         mReader = parser;
-        mImageGetter = imageGetter;
         mFlags = FROM_HTML_MODE_COMPACT;
     }
 
@@ -168,8 +162,6 @@ class ToSpannedConverter implements ContentHandler {
             start(mSpannableStringBuilder, new Tag());
         } else if (tag.equalsIgnoreCase("del")) {
             start(mSpannableStringBuilder, new Del());
-        } else if (tag.equalsIgnoreCase("img")) {
-            startImg(mSpannableStringBuilder, attributes, mImageGetter);
         }
     }
 
@@ -289,30 +281,6 @@ class ToSpannedConverter implements ContentHandler {
                 text.setSpan(span, where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-    }
-
-    private static void startImg(Editable text, Attributes attributes, Html.ImageGetter img) {
-
-        String src = attributes.getValue("", "src");
-        String width = attributes.getValue("", "width");
-        String height = attributes.getValue("", "height");
-
-        Drawable d = null;
-
-        if (img != null) {
-            d = img.getDrawable(src);
-            d.setBounds(0,0,Integer.parseInt(width), Integer.parseInt(height));
-        }
-
-        if (d == null) {
-            d = Resources.getSystem().getDrawable(android.R.drawable.ic_menu_report_image);
-            d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-        }
-
-        int len = text.length();
-        text.append("\uFFFC");
-        LineImageSpan lineImageSpan = new LineImageSpan(d, src);
-        text.setSpan(lineImageSpan, len, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private static void start(Editable text, Object mark) {

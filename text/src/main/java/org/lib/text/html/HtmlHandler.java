@@ -1,7 +1,6 @@
 package org.lib.text.html;
 
 import android.graphics.Typeface;
-import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.CharacterStyle;
@@ -13,7 +12,6 @@ import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
 import org.lib.text.effect.LabelSpan;
-import org.lib.text.effect.LineImageSpan;
 import org.lib.text.effect.NewBulletSpan;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
@@ -45,7 +43,7 @@ public class HtmlHandler {
      *
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness found in the wild.
      */
-    public static Spanned fromHtml(String source, Html.ImageGetter imageGetter) {
+    public static Spanned fromHtml(String source) {
         Parser parser = new Parser();
 
         try {
@@ -56,7 +54,7 @@ public class HtmlHandler {
         }
 
         ToSpannedConverter converter
-                = new ToSpannedConverter(source, parser, imageGetter);
+                = new ToSpannedConverter(source, parser);
 
         return converter.convert();
     }
@@ -94,9 +92,8 @@ public class HtmlHandler {
                     // close the previously opened list
                     isInList = false;
                     out.append("</ul>\n");
-                    out.append("<br>\n");
                 }
-
+                out.append("<br>\n");
             } else {
                 boolean isListItem = false;
                 ParagraphStyle[] paragraphStyles = text.getSpans(i, next, ParagraphStyle.class);
@@ -168,17 +165,6 @@ public class HtmlHandler {
                 }
                 if (characterStyle instanceof StrikeLineSpan) {
                     out.append("<del>");
-                }
-
-                if (characterStyle instanceof LineImageSpan) {
-                    // <img> 是空标签，它只包含属性，并且没有闭合标签。
-                    LineImageSpan imageSpan = ((LineImageSpan) characterStyle);
-                    out.append("<img src=\"").append(imageSpan.source()).append("\" ");
-                    out.append("width=\"").append(imageSpan.width()).append("\" ");
-                    out.append("height=\"").append(imageSpan.height()).append("\">");
-
-                    // Don't output the dummy character underlying the image.
-                    i = next;
                 }
             }
 
